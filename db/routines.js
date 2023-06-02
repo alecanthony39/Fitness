@@ -116,7 +116,7 @@ async function getPublicRoutinesByActivity({ id }) {
     [id]
   );
   await attachActivitiesToRoutines(routine);
-  console.log(routine);
+
   return routine.filter((routine) => routine.isPublic === true);
 }
 
@@ -139,17 +139,21 @@ RETURNING *;`,
 }
 
 async function destroyRoutine(id) {
-  const _routine = await getRoutineById(id);
+  await client.query(
+    `
+    DELETE FROM routine_activities
+WHERE "routineId" = $1;
+    `,
+    [id]
+  );
 
   await client.query(
     `
     DELETE FROM routines
-    WHERE id=$1
+    WHERE id= $1;
     `,
-    [_routine.id]
+    [id]
   );
-
-  return _routine;
 }
 
 module.exports = {
