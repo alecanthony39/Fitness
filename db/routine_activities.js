@@ -5,9 +5,35 @@ async function addActivityToRoutine({
   activityId,
   count,
   duration,
-}) {}
+}) {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const { rows: aR } = await client.query(
+      `
+    INSERT INTO routine_activities("routineId", "activityId", count, duration)
+    VALUES($1, $2, $3, $4)
+    
+    RETURNING *
+    `,
+      [routineId, activityId, count, duration]
+    );
 
-async function getRoutineActivityById(id) {}
+    return aR[0];
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function getRoutineActivityById(id) {
+  const { rows: routine } = await client.query(
+    `SELECT *
+  FROM routine_activities
+  WHERE id=${id}
+  `
+  );
+
+  return routine[0];
+}
 
 async function getRoutineActivitiesByRoutine({ id }) {}
 
