@@ -26,7 +26,7 @@ const { getPublicRoutinesByActivity } = require("../../db");
 
 describe("/api/activities", () => {
   describe("GET /api/activities", () => {
-    xit("Just returns a list of all activities in the database", async () => {
+    it("Just returns a list of all activities in the database", async () => {
       // Create a fake activity to watch for
       const fakeActivity = await createFakeActivity(
         "Running",
@@ -60,7 +60,7 @@ describe("/api/activities", () => {
       expect(response.body).toMatchObject(activityData);
     });
 
-    xit("responds with an error when a activity already exists with the same name", async () => {
+    it("responds with an error when a activity already exists with the same name", async () => {
       const { token } = await createFakeUserWithToken("alice");
 
       await createFakeActivity("Push Ups", "Do 30 reps");
@@ -74,7 +74,7 @@ describe("/api/activities", () => {
         .post("/api/activities")
         .send(activityData)
         .set("Authorization", `Bearer ${token}`);
-
+      console.log("michell", response.body);
       expectToHaveErrorMessage(
         response.body,
         ActivityExistsError(activityData.name)
@@ -154,7 +154,7 @@ describe("/api/activities", () => {
   });
 
   describe("GET /api/activities/:activityId/routines", () => {
-    xit("Get a list of all public routines which feature that activity", async () => {
+    it("Get a list of all public routines which feature that activity", async () => {
       const { fakeRoutines } = await createFakeUserWithRoutines("Allen");
       const fakeActivity = await createFakeActivity(
         "Weight Lifting",

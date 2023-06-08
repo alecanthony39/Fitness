@@ -8,6 +8,7 @@ async function createActivity({ name, description }) {
     `
   INSERT INTO activities(name, description)
   VALUES($1, $2)
+  ON CONFLICT (name) DO NOTHING
   RETURNING *;
   `,
     [name, description]
@@ -39,14 +40,19 @@ async function getActivityById(id) {
 }
 
 async function getActivityByName(name) {
-  const { rows: activities } = await client.query(
-    `
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const { rows: activities } = await client.query(
+      `
   SELECT *
   FROM activities
   WHERE name=$1;`,
-    [name]
-  );
-  return activities[0];
+      [name]
+    );
+    return activities[0];
+  } catch (error) {
+    throw error;
+  }
 }
 
 // used as a helper inside db/routines.js

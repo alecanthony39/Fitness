@@ -3,7 +3,10 @@ require("dotenv").config();
 const express = require("express");
 const { createUser, getUser, getUserByUsername } = require("../db/users");
 const jwt = require("jsonwebtoken");
-const { UserDoesNotExistError, UnauthorizedError } = require("../errors");
+const {
+  getAllRoutinesByUser,
+  getPublicRoutinesByUser,
+} = require("../db/routines");
 const { requireUser } = require("./utils");
 const router = express.Router();
 
@@ -88,5 +91,24 @@ router.get("/me", requireUser, async (req, res, next) => {
 });
 
 // GET /api/users/:username/routines
+router.get("/:username/routines", requireUser, async (req, res, next) => {
+  const user = await getUserByUsername(req.user.username);
+  if (user.id === req.user.id) {
+    const routine = await getAllRoutinesByUser({ username: req.user.username });
+    res.send(routine);
+  } else {
+    const _routines = await getPublicRoutinesByUser({
+      username: req.user.username,
+    });
+    res.send(_routines);
+  }
+  // const routines = await getAllRoutinesByUser({ username: req.user.username });
+  // console.log(req.authirization);
+  // const pRoutines = await getPublicRoutinesByUser({
+  //   username: req.user.username,
+  // });
+
+  // res.send(pRoutines);
+});
 
 module.exports = router;

@@ -59,7 +59,8 @@ async function getAllPublicRoutines() {
     `
     SELECT routines.*, users.username AS "creatorName"
     FROM routines
-    JOIN users ON users.id = routines."creatorId"
+    JOIN users ON routines."creatorId" = users.id
+    WHERE "isPublic" = true
     
     
     `
@@ -75,7 +76,7 @@ async function getAllRoutinesByUser({ username }) {
     `
     SELECT routines.*, users.username AS "creatorName"
     FROM routines
-    JOIN users ON users.id = routines."creatorId"
+    JOIN users ON routines."creatorId" = users.id
     WHERE "creatorId"=$1;
     
     `,
@@ -94,8 +95,9 @@ async function getPublicRoutinesByUser({ username }) {
     `
     SELECT routines.*, users.username AS "creatorName"
     FROM routines
-    JOIN users ON users.id = routines."creatorId"
-    WHERE "creatorId"=$1;
+    JOIN users ON  routines."creatorId" = users.id 
+    WHERE "creatorId"=$1 
+    AND "isPublic" = true
     
     `,
     [user.id]
@@ -103,7 +105,7 @@ async function getPublicRoutinesByUser({ username }) {
 
   await attachActivitiesToRoutines(routine);
 
-  return routine.filter((routine) => routine.isPublic === true);
+  return routine;
 }
 
 async function getPublicRoutinesByActivity({ id }) {
@@ -111,7 +113,7 @@ async function getPublicRoutinesByActivity({ id }) {
     `SELECT routines.*, users.username AS "creatorName"
     FROM routines
     JOIN users ON users.id = routines."creatorId"
-    JOIN routine_activities ON "routineId" = routines.id
+    JOIN routine_activities ON routine_activities."routineId" = routines.id
     WHERE routine_activities."activityId"=$1;`,
     [id]
   );
