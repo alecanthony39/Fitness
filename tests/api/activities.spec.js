@@ -42,7 +42,7 @@ describe("/api/activities", () => {
   });
 
   describe("POST /api/activities (*)", () => {
-    xit("Creates a new activity", async () => {
+    it("Creates a new activity", async () => {
       const { token } = await createFakeUserWithToken("bob");
 
       const activityData = {
@@ -83,7 +83,7 @@ describe("/api/activities", () => {
   });
 
   describe("PATCH /api/activities/:activityId (*)", () => {
-    xit("Anyone can update an activity (yes, this could lead to long term problems a la wikipedia)", async () => {
+    it("Anyone can update an activity (yes, this could lead to long term problems a la wikipedia)", async () => {
       const { token } = await createFakeUserWithToken("Allison");
       const fakeActivity = await createFakeActivity(
         "Run in Place",
@@ -108,7 +108,7 @@ describe("/api/activities", () => {
       });
     });
 
-    xit("returns an error when updating an activity that does not exist", async () => {
+    it("returns an error when updating an activity that does not exist", async () => {
       const { token } = await createFakeUserWithToken("Barry");
 
       const newActivityData = {
@@ -124,7 +124,7 @@ describe("/api/activities", () => {
       expectToHaveErrorMessage(response.body, ActivityNotFoundError(10000));
     });
 
-    xit("returns an error when changing an activity to have the name of an existing activity", async () => {
+    it("returns an error when changing an activity to have the name of an existing activity", async () => {
       const { token } = await createFakeUserWithToken("Jane");
       const fakeActivity = await createFakeActivity(
         "Beat Saber",
@@ -178,7 +178,7 @@ describe("/api/activities", () => {
       expect(response.body).toEqual(routinesFromDB);
     });
 
-    xit("Should return an error when you ask for an activity that does not exist", async () => {
+    it("Should return an error when you ask for an activity that does not exist", async () => {
       const response = await request(app).get("/api/activities/10000/routines");
 
       expectToHaveErrorMessage(response.body, ActivityNotFoundError(10000));

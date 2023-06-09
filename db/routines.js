@@ -21,7 +21,9 @@ async function createRoutine({ creatorId, isPublic, name, goal }) {
 }
 
 async function getRoutineById(id) {
-  const { rows: routine } = await client.query(`
+  const {
+    rows: [routine],
+  } = await client.query(`
   SELECT * 
   FROM routines
   WHERE id=${id};`);
@@ -149,13 +151,18 @@ WHERE "routineId" = $1;
     [id]
   );
 
-  await client.query(
+  const {
+    rows: [routine],
+  } = await client.query(
     `
     DELETE FROM routines
-    WHERE id= $1;
+    WHERE id= $1
+    RETURNING *
     `,
     [id]
   );
+
+  return routine;
 }
 
 module.exports = {

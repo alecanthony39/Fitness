@@ -12,7 +12,7 @@ async function addActivityToRoutine({
       `
     INSERT INTO routine_activities("routineId", "activityId", count, duration)
     VALUES($1, $2, $3, $4)
-    
+    ON CONFLICT ("routineId", "activityId") DO NOTHING
     RETURNING *
     `,
       [routineId, activityId, count, duration]
@@ -65,23 +65,42 @@ RETURNING *;`,
 }
 
 async function destroyRoutineActivity(id) {
-  const { rows: RA } = await client.query(
-    `
-    DELETE FROM routine_activities
-    WHERE "routineId" = $1
-    RETURNING id`,
-    [id]
-  );
+  try {
+    const { rows } = await client.query(
+      `DELETE FROM routine_activities
+      WHERE id=$1
+      RETURNING *;
+      `,
+      [id]
+    );
 
-  return RA[0];
+    const [routineActivity] = rows;
+    return routineActivity;
+  } catch (error) {
+    console.error(error);
+  }
 }
 async function canEditRoutineActivity(routineActivityId, userId) {
-  const routine = await getRoutineActivityById(routineActivityId);
-  console.log("alec", routine, userId);
-  if (routine.id === userId) {
-    return true;
+  try {
+    const { rows } = await client.query(
+      `
+      SELECT routines."creatorId"
+      FROM routines
+      JOIN routine_activities ON routine_activities."routineId" = routines.id
+      WHERE routine_activities.id=$1;
+      `,
+      [routineActivityId]
+    );
+
+    const [routineActivity] = rows;
+    if (routineActivity.creatorId === userId) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.error(error);
   }
-  return false;
 }
 
 module.exports = {
